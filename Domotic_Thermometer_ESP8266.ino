@@ -16,6 +16,8 @@ AsyncWebServer server(WebServerPort);
 
 OneWire  ds(14);  // on pin 14
 
+float getTemperature(int functionCallNumber = 0);
+
 void setup(void) {
   Serial.begin(9600);
   
@@ -46,7 +48,7 @@ void loop(void){
   
 }
 
-float getTemperature() {
+float getTemperature(int functionCallNumber) {
   byte i;
   byte present = 0;
   byte type_s;
@@ -57,6 +59,13 @@ float getTemperature() {
   if ( !ds.search(addr)) {
     ds.reset_search();
     delay(250);
+  }
+
+  if (OneWire::crc8(addr, 7) != addr[7]) {
+    if(functionCallNumber<1){ 
+       functionCallNumber= 1;
+      return getTemperature(functionCallNumber); //It's prevent CRC invalidity and keeping mind stooping infinity loop
+    }
   }
   Serial.println();
  

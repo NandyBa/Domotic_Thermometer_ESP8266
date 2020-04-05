@@ -2,6 +2,10 @@
 #include "Config.h"
 
 #include <OneWire.h>
+#include <ESPAsyncWebServer.h> // Library to create the server
+
+// Create AsyncWebServer object on port specified on the config file
+AsyncWebServer server(WebServerPort);
 
 // OneWire DS18S20, DS18B20, DS1822 Temperature Example
 //
@@ -14,9 +18,35 @@ OneWire  ds(14);  // on pin 14
 
 void setup(void) {
   Serial.begin(9600);
+  
+  // Connect to Wi-Fi network with SSID and password
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  WiFi.config(ip, gateway, subnet); // Static IP Setup Info Here
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  // Print local IP address and start web server
+  Serial.println("");
+  Serial.println("WiFi connected.");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send(200, "text/plain", String(getTemperature()));
+  });
+
+  server.begin();
+
 }
 
-void loop(void) {
+void loop(void){
+  
+}
+
+float getTemperature() {
   byte i;
   byte present = 0;
   byte type_s;
@@ -27,7 +57,6 @@ void loop(void) {
   if ( !ds.search(addr)) {
     ds.reset_search();
     delay(250);
-    return;
   }
   Serial.println();
  
@@ -43,7 +72,7 @@ void loop(void) {
       type_s = 0;
       break;
     default:
-      return;
+      break;
   } 
 
   ds.reset();

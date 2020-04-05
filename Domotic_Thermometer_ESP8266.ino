@@ -112,12 +112,12 @@ float getTemperature() {
   }
 
   celsius = (float)raw / 16.0;
-  
+
   if(Unit){   
-    Serial.print(celsius);
+    return celsius;
   }else{
     fahrenheit = celsius * 1.8 + 32.0;
-    Serial.print(fahrenheit);
+    return fahrenheit;
   }
   
 }

@@ -110,9 +110,10 @@ float getTemperature() {
     else if (cfg == 0x40) raw = raw & ~1; // 11 bit res, 375 ms
     //// default is 12 bit resolution, 750 ms conversion time
   }
+
+  celsius = (float)raw / 16.0;
   
-  if(Unit){
-    celsius = (float)raw / 16.0;
+  if(Unit){   
     Serial.print(celsius);
   }else{
     fahrenheit = celsius * 1.8 + 32.0;
